@@ -1,12 +1,5 @@
-/* ============================================================
-   NEXUS Tic-Tac-Toe — style.css
-   Theme: Cyberpunk neon · dark/light toggle
-   Fonts: Orbitron (display) + Rajdhani (body)
-   ============================================================ */
 
-/* ─── 1. CSS CUSTOM PROPERTIES (DESIGN TOKENS) ────────────── */
 :root {
-  /* Dark theme (default) */
   --bg:            #070b14;
   --surface:       #0d1526;
   --surface-2:     #121e35;
@@ -60,7 +53,6 @@
   --card-bg:       rgba(255, 255, 255, 0.97);
 }
 
-/* ─── 2. RESET & BASE ──────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html { font-size: 16px; scroll-behavior: smooth; }
@@ -82,7 +74,6 @@ body {
 button { cursor: pointer; border: none; background: none; font-family: inherit; }
 button:focus-visible { outline: 2px solid var(--x-color); outline-offset: 3px; border-radius: 6px; }
 
-/* ─── 3. BACKGROUND DECORATIONS ───────────────────────────── */
 .bg-grid {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background-image:
@@ -120,7 +111,6 @@ button:focus-visible { outline: 2px solid var(--x-color); outline-offset: 3px; b
   to   { transform: translate(30px, 40px) scale(1.08); }
 }
 
-/* ─── 4. APP CONTAINER ────────────────────────────────────── */
 .app {
   position: relative; z-index: 1;
   width: min(480px, 95vw);
@@ -129,7 +119,6 @@ button:focus-visible { outline: 2px solid var(--x-color); outline-offset: 3px; b
   padding: 28px 20px 32px;
 }
 
-/* ─── 5. HEADER ────────────────────────────────────────────── */
 .header {
   position: relative;
   text-align: center;
@@ -178,7 +167,6 @@ button:focus-visible { outline: 2px solid var(--x-color); outline-offset: 3px; b
   box-shadow: 0 0 20px var(--x-glow);
 }
 
-/* ─── 6. MODE SELECTOR ─────────────────────────────────────── */
 .mode-selector {
   display: flex;
   gap: 12px;
@@ -217,7 +205,6 @@ button:focus-visible { outline: 2px solid var(--x-color); outline-offset: 3px; b
 }
 .mode-icon { font-size: 1.1rem; }
 
-/* ─── 7. SCOREBOARD ────────────────────────────────────────── */
 .scoreboard {
   display: flex;
   align-items: center;
@@ -290,7 +277,6 @@ button:focus-visible { outline: 2px solid var(--x-color); outline-offset: 3px; b
   color: var(--text-secondary);
 }
 
-/* ─── 8. STATUS BAR ─────────────────────────────────────────── */
 .status-bar {
   display: flex; align-items: center; justify-content: center;
   gap: 10px;
@@ -331,7 +317,6 @@ button:focus-visible { outline: 2px solid var(--x-color); outline-offset: 3px; b
   color: var(--text-primary);
 }
 
-/* ─── 9. GAME BOARD ─────────────────────────────────────────── */
 .board-wrapper {
   width: 100%;
   display: flex; justify-content: center;
@@ -353,7 +338,6 @@ button:focus-visible { outline: 2px solid var(--x-color); outline-offset: 3px; b
     inset 0 1px 0 rgba(255,255,255,0.05);
 }
 
-/* ─── CELL ─── */
 .cell {
   aspect-ratio: 1;
   border-radius: var(--radius-md);
@@ -372,14 +356,12 @@ button:focus-visible { outline: 2px solid var(--x-color); outline-offset: 3px; b
   -webkit-tap-highlight-color: transparent;
 }
 
-/* hover only on empty cells */
 .cell:not([data-mark]):hover {
   border-color: var(--border-strong);
   background: var(--surface);
   transform: scale(1.04);
   box-shadow: 0 4px 20px rgba(0,0,0,0.2);
 }
-/* preview symbol on hover */
 .cell:not([data-mark]):hover::after {
   content: attr(data-preview);
   position: absolute; inset: 0;
@@ -449,14 +431,12 @@ button:focus-visible { outline: 2px solid var(--x-color); outline-offset: 3px; b
   75%  { transform: scale(1.04); }
 }
 
-/* Board game-over state: dim non-winning cells */
 .board.game-over .cell:not(.winner) {
   opacity: 0.35;
 }
 .board.game-over .cell { cursor: default !important; }
 .board.game-over .cell:not([data-mark]):hover { transform: none; border-color: var(--border); background: var(--surface-2); }
 
-/* ─── 10. CONTROLS ──────────────────────────────────────────── */
 .controls {
   display: flex; gap: 12px; width: 100%;
 }
@@ -587,7 +567,6 @@ button:focus-visible { outline: 2px solid var(--x-color); outline-offset: 3px; b
   box-shadow: 0 0 35px var(--x-glow);
 }
 
-/* ─── 12. AI THINKING INDICATOR ─────────────────────────────── */
 @keyframes aiThink {
   0%   { box-shadow: 0 0 15px var(--o-glow); }
   50%  { box-shadow: 0 0 35px var(--o-color), inset 0 0 20px rgba(255,77,170,0.15); }
@@ -595,7 +574,6 @@ button:focus-visible { outline: 2px solid var(--x-color); outline-offset: 3px; b
 }
 .board.ai-thinking { animation: aiThink 0.7s ease-in-out infinite; }
 
-/* ─── 13. SCORE UPDATE ANIMATION ─────────────────────────────── */
 @keyframes scoreJump {
   0%   { transform: scale(1); }
   40%  { transform: scale(1.4) translateY(-4px); }
@@ -604,7 +582,6 @@ button:focus-visible { outline: 2px solid var(--x-color); outline-offset: 3px; b
 }
 .score-jump { animation: scoreJump 0.5s var(--spring) forwards; }
 
-/* ─── 14. RESPONSIVE ────────────────────────────────────────── */
 @media (max-width: 400px) {
   .app { gap: 14px; padding: 20px 12px 24px; }
   .score-card { padding: 12px 14px; gap: 8px; }
@@ -614,7 +591,6 @@ button:focus-visible { outline: 2px solid var(--x-color); outline-offset: 3px; b
   .board { padding: 10px; gap: 7px; }
 }
 
-/* ─── 15. SCROLLBAR ─────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
