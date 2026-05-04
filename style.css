@@ -1,0 +1,620 @@
+/* ============================================================
+   NEXUS Tic-Tac-Toe — style.css
+   Theme: Cyberpunk neon · dark/light toggle
+   Fonts: Orbitron (display) + Rajdhani (body)
+   ============================================================ */
+
+/* ─── 1. CSS CUSTOM PROPERTIES (DESIGN TOKENS) ────────────── */
+:root {
+  /* Dark theme (default) */
+  --bg:            #070b14;
+  --surface:       #0d1526;
+  --surface-2:     #121e35;
+  --border:        rgba(0, 220, 255, 0.15);
+  --border-strong: rgba(0, 220, 255, 0.40);
+
+  --x-color:       #00dcff;   /* cyan  */
+  --x-glow:        rgba(0, 220, 255, 0.45);
+  --o-color:       #ff4daa;   /* pink  */
+  --o-glow:        rgba(255, 77, 170, 0.45);
+
+  --text-primary:  #e8f4ff;
+  --text-secondary:#7a9bbf;
+  --text-muted:    #3a5470;
+
+  --win-bg:        rgba(0, 220, 255, 0.08);
+  --win-border:    rgba(0, 220, 255, 0.7);
+
+  --overlay-bg:    rgba(7, 11, 20, 0.88);
+  --card-bg:       rgba(13, 21, 38, 0.95);
+
+  --radius-sm:     8px;
+  --radius-md:     16px;
+  --radius-lg:     24px;
+
+  --transition:    0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --spring:        0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Light theme overrides */
+[data-theme="light"] {
+  --bg:            #f0f4fc;
+  --surface:       #ffffff;
+  --surface-2:     #e8eef8;
+  --border:        rgba(0, 130, 180, 0.18);
+  --border-strong: rgba(0, 130, 180, 0.45);
+
+  --x-color:       #007acc;
+  --x-glow:        rgba(0, 122, 204, 0.35);
+  --o-color:       #d6006e;
+  --o-glow:        rgba(214, 0, 110, 0.30);
+
+  --text-primary:  #0d1f3c;
+  --text-secondary:#4a6080;
+  --text-muted:    #9ab0c8;
+
+  --win-bg:        rgba(0, 122, 204, 0.07);
+  --win-border:    rgba(0, 122, 204, 0.6);
+
+  --overlay-bg:    rgba(240, 244, 252, 0.90);
+  --card-bg:       rgba(255, 255, 255, 0.97);
+}
+
+/* ─── 2. RESET & BASE ──────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  overflow-x: hidden;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+button:focus-visible { outline: 2px solid var(--x-color); outline-offset: 3px; border-radius: 6px; }
+
+/* ─── 3. BACKGROUND DECORATIONS ───────────────────────────── */
+.bg-grid {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0, 220, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 220, 255, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  transition: opacity 0.4s;
+}
+[data-theme="light"] .bg-grid {
+  background-image:
+    linear-gradient(rgba(0, 122, 204, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 122, 204, 0.05) 1px, transparent 1px);
+}
+
+.bg-orbs { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.orb {
+  position: absolute; border-radius: 50%;
+  filter: blur(80px); opacity: 0.18;
+  animation: drift 14s ease-in-out infinite alternate;
+}
+.orb-1 {
+  width: 500px; height: 500px;
+  background: var(--x-color);
+  top: -120px; left: -100px;
+  animation-delay: 0s;
+}
+.orb-2 {
+  width: 420px; height: 420px;
+  background: var(--o-color);
+  bottom: -100px; right: -80px;
+  animation-delay: -7s;
+}
+@keyframes drift {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(30px, 40px) scale(1.08); }
+}
+
+/* ─── 4. APP CONTAINER ────────────────────────────────────── */
+.app {
+  position: relative; z-index: 1;
+  width: min(480px, 95vw);
+  display: flex; flex-direction: column; align-items: center;
+  gap: 20px;
+  padding: 28px 20px 32px;
+}
+
+/* ─── 5. HEADER ────────────────────────────────────────────── */
+.header {
+  position: relative;
+  text-align: center;
+  width: 100%;
+}
+
+.logo {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(2rem, 8vw, 3rem);
+  letter-spacing: 0.15em;
+  color: var(--text-primary);
+  text-shadow: 0 0 30px var(--x-glow);
+  line-height: 1;
+}
+.logo-x {
+  color: var(--x-color);
+  text-shadow: 0 0 20px var(--x-color), 0 0 60px var(--x-glow);
+}
+.logo-sub {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Theme Toggle */
+.theme-toggle {
+  position: absolute;
+  top: 0; right: 0;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--transition);
+  box-shadow: 0 0 12px var(--x-glow);
+}
+.theme-toggle:hover {
+  background: var(--surface-2);
+  transform: rotate(20deg) scale(1.1);
+  box-shadow: 0 0 20px var(--x-glow);
+}
+
+/* ─── 6. MODE SELECTOR ─────────────────────────────────────── */
+.mode-selector {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.mode-btn {
+  flex: 1;
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px;
+  padding: 12px 8px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  transition: var(--transition);
+}
+.mode-btn:hover {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+  background: var(--surface-2);
+  transform: translateY(-2px);
+}
+.mode-btn.active {
+  border-color: var(--x-color);
+  background: rgba(0, 220, 255, 0.08);
+  color: var(--x-color);
+  box-shadow: 0 0 20px var(--x-glow), inset 0 0 20px rgba(0,220,255,0.06);
+}
+[data-theme="light"] .mode-btn.active {
+  background: rgba(0, 122, 204, 0.08);
+}
+.mode-icon { font-size: 1.1rem; }
+
+/* ─── 7. SCOREBOARD ────────────────────────────────────────── */
+.scoreboard {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 4px 30px rgba(0,0,0,0.2);
+}
+
+.score-card {
+  flex: 1;
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 20px;
+  transition: var(--transition);
+}
+.score-card.active-turn {
+  background: var(--surface-2);
+}
+
+.score-symbol {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.8rem;
+  font-weight: 900;
+  line-height: 1;
+  transition: var(--transition);
+}
+.x-symbol {
+  color: var(--x-color);
+  text-shadow: 0 0 14px var(--x-color);
+}
+.o-symbol {
+  color: var(--o-color);
+  text-shadow: 0 0 14px var(--o-color);
+}
+
+.score-info { display: flex; flex-direction: column; gap: 2px; }
+.score-name {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.score-value {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.score-divider {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 0 16px;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+.draw-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.draw-value {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+/* ─── 8. STATUS BAR ─────────────────────────────────────────── */
+.status-bar {
+  display: flex; align-items: center; justify-content: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 100px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  width: 100%;
+  transition: var(--transition);
+}
+
+.status-indicator {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--x-color);
+  box-shadow: 0 0 10px var(--x-color);
+  animation: pulse 1.6s ease-in-out infinite;
+  transition: var(--transition);
+}
+.status-indicator.o-turn {
+  background: var(--o-color);
+  box-shadow: 0 0 10px var(--o-color);
+}
+.status-indicator.idle { animation: none; background: var(--text-muted); box-shadow: none; }
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.4); opacity: 0.7; }
+}
+
+.status-text {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+/* ─── 9. GAME BOARD ─────────────────────────────────────────── */
+.board-wrapper {
+  width: 100%;
+  display: flex; justify-content: center;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: min(380px, 100%);
+  aspect-ratio: 1;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow:
+    0 0 0 1px var(--border),
+    0 8px 40px rgba(0,0,0,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+/* ─── CELL ─── */
+.cell {
+  aspect-ratio: 1;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(1.8rem, 7vw, 2.6rem);
+  font-weight: 900;
+  color: transparent;
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition),
+              transform var(--spring), box-shadow var(--transition);
+  position: relative;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* hover only on empty cells */
+.cell:not([data-mark]):hover {
+  border-color: var(--border-strong);
+  background: var(--surface);
+  transform: scale(1.04);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+/* preview symbol on hover */
+.cell:not([data-mark]):hover::after {
+  content: attr(data-preview);
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: clamp(1.8rem, 7vw, 2.6rem);
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  opacity: 0.15;
+  color: var(--x-color);
+  pointer-events: none;
+}
+.cell.o-preview:not([data-mark]):hover::after { color: var(--o-color); }
+
+/* Filled cells */
+.cell[data-mark="X"] {
+  color: var(--x-color);
+  border-color: rgba(0, 220, 255, 0.3);
+  background: rgba(0, 220, 255, 0.05);
+  text-shadow: 0 0 16px var(--x-color), 0 0 40px var(--x-glow);
+  box-shadow: inset 0 0 20px rgba(0, 220, 255, 0.07);
+  cursor: default;
+  animation: markPop var(--spring) forwards;
+}
+
+.cell[data-mark="O"] {
+  color: var(--o-color);
+  border-color: rgba(255, 77, 170, 0.3);
+  background: rgba(255, 77, 170, 0.05);
+  text-shadow: 0 0 16px var(--o-color), 0 0 40px var(--o-glow);
+  box-shadow: inset 0 0 20px rgba(255, 77, 170, 0.07);
+  cursor: default;
+  animation: markPop var(--spring) forwards;
+}
+
+/* Winning cells */
+.cell.winner {
+  animation: winnerPulse 0.8s ease forwards;
+  border-width: 2px;
+}
+.cell[data-mark="X"].winner {
+  background: var(--win-bg);
+  border-color: var(--win-border);
+  box-shadow:
+    0 0 0 1px var(--win-border),
+    0 0 25px var(--x-glow),
+    inset 0 0 30px rgba(0, 220, 255, 0.15);
+}
+.cell[data-mark="O"].winner {
+  background: rgba(255, 77, 170, 0.08);
+  border-color: rgba(255, 77, 170, 0.7);
+  box-shadow:
+    0 0 0 1px rgba(255, 77, 170, 0.7),
+    0 0 25px var(--o-glow),
+    inset 0 0 30px rgba(255, 77, 170, 0.15);
+}
+
+/* Pop-in for mark placement */
+@keyframes markPop {
+  0%   { transform: scale(0) rotate(-10deg); opacity: 0; }
+  60%  { transform: scale(1.15) rotate(3deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes winnerPulse {
+  0%, 100% { transform: scale(1); }
+  25%  { transform: scale(1.08); }
+  75%  { transform: scale(1.04); }
+}
+
+/* Board game-over state: dim non-winning cells */
+.board.game-over .cell:not(.winner) {
+  opacity: 0.35;
+}
+.board.game-over .cell { cursor: default !important; }
+.board.game-over .cell:not([data-mark]):hover { transform: none; border-color: var(--border); background: var(--surface-2); }
+
+/* ─── 10. CONTROLS ──────────────────────────────────────────── */
+.controls {
+  display: flex; gap: 12px; width: 100%;
+}
+
+.btn-restart {
+  flex: 2;
+  padding: 14px 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--x-color);
+  background: rgba(0, 220, 255, 0.10);
+  color: var(--x-color);
+  font-family: 'Orbitron', monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: var(--transition);
+  box-shadow: 0 0 16px var(--x-glow);
+}
+.btn-restart:hover {
+  background: rgba(0, 220, 255, 0.20);
+  transform: translateY(-2px);
+  box-shadow: 0 0 28px var(--x-glow);
+}
+.btn-restart:active { transform: translateY(0) scale(0.98); }
+
+.btn-icon { font-size: 1.2rem; display: inline-block; transition: transform 0.5s; }
+.btn-restart:hover .btn-icon { transform: rotate(-180deg); }
+
+.btn-reset-score {
+  flex: 1;
+  padding: 14px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: var(--transition);
+}
+.btn-reset-score:hover {
+  border-color: var(--border-strong);
+  color: var(--text-secondary);
+  background: var(--surface-2);
+}
+
+/* ─── 11. WIN OVERLAY ───────────────────────────────────────── */
+.overlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: var(--overlay-bg);
+  backdrop-filter: blur(12px) saturate(1.5);
+  -webkit-backdrop-filter: blur(12px) saturate(1.5);
+  display: flex; align-items: center; justify-content: center;
+  animation: overlayIn 0.3s ease forwards;
+}
+.overlay[hidden] { display: none; }
+
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.overlay-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: 40px 48px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 60px var(--x-glow);
+  animation: cardIn var(--spring) forwards;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+
+@keyframes cardIn {
+  from { transform: scale(0.7) translateY(20px); opacity: 0; }
+  to   { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.overlay-emoji { font-size: 3.5rem; line-height: 1; animation: bounceIn 0.6s var(--spring) 0.2s both; }
+@keyframes bounceIn {
+  from { transform: scale(0) rotate(-20deg); }
+  to   { transform: scale(1) rotate(0); }
+}
+
+.overlay-title {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(1.4rem, 5vw, 2rem);
+  font-weight: 900;
+  color: var(--x-color);
+  text-shadow: 0 0 20px var(--x-glow);
+  letter-spacing: 0.05em;
+}
+.overlay-title.o-win {
+  color: var(--o-color);
+  text-shadow: 0 0 20px var(--o-glow);
+}
+.overlay-title.draw { color: var(--text-secondary); text-shadow: none; }
+
+.overlay-sub {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.overlay-btn {
+  margin-top: 8px;
+  padding: 14px 36px;
+  border-radius: 100px;
+  border: 1px solid var(--x-color);
+  background: rgba(0, 220, 255, 0.12);
+  color: var(--x-color);
+  font-family: 'Orbitron', monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: var(--transition);
+  box-shadow: 0 0 20px var(--x-glow);
+}
+.overlay-btn:hover {
+  background: rgba(0, 220, 255, 0.25);
+  transform: scale(1.04);
+  box-shadow: 0 0 35px var(--x-glow);
+}
+
+/* ─── 12. AI THINKING INDICATOR ─────────────────────────────── */
+@keyframes aiThink {
+  0%   { box-shadow: 0 0 15px var(--o-glow); }
+  50%  { box-shadow: 0 0 35px var(--o-color), inset 0 0 20px rgba(255,77,170,0.15); }
+  100% { box-shadow: 0 0 15px var(--o-glow); }
+}
+.board.ai-thinking { animation: aiThink 0.7s ease-in-out infinite; }
+
+/* ─── 13. SCORE UPDATE ANIMATION ─────────────────────────────── */
+@keyframes scoreJump {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.4) translateY(-4px); }
+  70%  { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+.score-jump { animation: scoreJump 0.5s var(--spring) forwards; }
+
+/* ─── 14. RESPONSIVE ────────────────────────────────────────── */
+@media (max-width: 400px) {
+  .app { gap: 14px; padding: 20px 12px 24px; }
+  .score-card { padding: 12px 14px; gap: 8px; }
+  .score-symbol { font-size: 1.4rem; }
+  .score-value  { font-size: 1.3rem; }
+  .overlay-card { padding: 28px 24px; }
+  .board { padding: 10px; gap: 7px; }
+}
+
+/* ─── 15. SCROLLBAR ─────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
