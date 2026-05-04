@@ -1,33 +1,14 @@
-/**
- * ============================================================
- * NEXUS Tic-Tac-Toe — script.js
- * Features: PvP · Unbeatable AI (Minimax) · Scoreboard
- *           Animations · Sound Effects · Dark/Light Theme
- * ============================================================
- *
- * Architecture: IIFE (Immediately Invoked Function Expression)
- * — keeps everything out of global scope.
- * Broken into clear modules:
- *   STATE    — single source of truth for all game data
- *   SOUND    — Web Audio API synth sounds (no files needed)
- *   RENDER   — all DOM updates live here
- *   GAME     — core logic: moves, win detection, Minimax AI
- *   EVENTS   — all event listeners wired up once
- */
+
 
 (function () {
   'use strict';
 
-  /* ══════════════════════════════════════════════════════════
-     1. STATE  — single source of truth
-  ══════════════════════════════════════════════════════════ */
   const STATE = {
     board:       Array(9).fill(null),   // null | 'X' | 'O'
     current:     'X',                   // whose turn it is
     mode:        'pvp',                 // 'pvp' | 'ai'
     gameOver:    false,
     scores:      { X: 0, O: 0, draw: 0 },
-    // Winning line combos (indices into the 3×3 board)
     WINS: [
       [0,1,2],[3,4,5],[6,7,8],   // rows
       [0,3,6],[1,4,7],[2,5,8],   // columns
@@ -35,9 +16,6 @@
     ],
   };
 
-  /* ══════════════════════════════════════════════════════════
-     2. DOM REFERENCES  — grab once, reuse everywhere
-  ══════════════════════════════════════════════════════════ */
   const DOM = {
     board:          document.getElementById('board'),
     cells:          document.querySelectorAll('.cell'),
@@ -64,25 +42,15 @@
     html:           document.documentElement,
   };
 
-  /* ══════════════════════════════════════════════════════════
-     3. SOUND ENGINE  — Web Audio API, no external files
-     Generates tones via oscillators for a retro-synth feel.
-  ══════════════════════════════════════════════════════════ */
+
   const SOUND = (() => {
-    let ctx = null;   // AudioContext (lazy-init on first user interaction)
+    let ctx = null;   
 
     function getCtx() {
       if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
       return ctx;
     }
 
-    /**
-     * Play a simple synthesised tone.
-     * @param {number} freq     - Frequency in Hz
-     * @param {string} type     - Oscillator wave type
-     * @param {number} duration - Seconds
-     * @param {number} vol      - Volume 0..1
-     */
     function tone(freq, type = 'sine', duration = 0.12, vol = 0.18) {
       try {
         const ac  = getCtx();
@@ -125,11 +93,7 @@
     };
   })();
 
-  /* ══════════════════════════════════════════════════════════
-     4. RENDER  — all DOM mutations live here
-  ══════════════════════════════════════════════════════════ */
   const RENDER = {
-    /** Update all cell appearances from STATE.board */
     board() {
       DOM.cells.forEach((cell, i) => {
         const mark = STATE.board[i];
@@ -169,7 +133,6 @@
       DOM.board.classList.add('game-over');
     },
 
-    /** Animate board for AI thinking */
     aiThinking(on) {
       DOM.board.classList.toggle('ai-thinking', on);
     },
@@ -235,12 +198,8 @@
     },
   };
 
-  /* ══════════════════════════════════════════════════════════
-     5. GAME LOGIC
-  ══════════════════════════════════════════════════════════ */
-  const GAME = {
 
-    /** Apply a move, check result, then hand off to AI if needed */
+  const GAME = {
     playMove(index) {
       if (STATE.gameOver || STATE.board[index]) return;
 
@@ -335,37 +294,9 @@
       RENDER.reset();
     },
 
-    /* ── AI VIA MINIMAX ─────────────────────────────────────
-     *
-     * HOW MINIMAX WORKS (in plain English):
-     * ─────────────────────────────────────
-     * Imagine the AI looking ahead at every possible game.
-     * It builds a tree of ALL possible moves from the current
-     * board, all the way to a terminal state (win/draw/loss).
-     *
-     * For each terminal state it assigns a SCORE:
-     *   +10 → AI (O) wins
-     *    -10 → Human (X) wins
-     *     0  → Draw
-     *
-     * The AI then "backs up" scores through the tree:
-     *   • On the AI's turn (MAXIMIZE) → pick the move
-     *     with the HIGHEST score (AI plays to win).
-     *   • On human's turn (MINIMIZE) → pick the move
-     *     with the LOWEST score (AI assumes human plays optimally).
-     *
-     * Alpha-Beta Pruning (bonus optimisation applied here):
-     *   We track `alpha` (best score AI already found) and
-     *   `beta` (best score human already found). When a branch
-     *   CAN'T possibly improve on what we've already found,
-     *   we prune (skip) it entirely — making the AI faster.
-     *
-     * Result: The AI never loses. At best you draw.
-     * ─────────────────────────────────────────────────────── */
 
     triggerAI() {
       RENDER.aiThinking(true);
-      // Small delay so the UI updates feel natural (not instant)
       setTimeout(() => {
         const best = this.getBestMove(STATE.board);
         RENDER.aiThinking(false);
@@ -373,11 +304,7 @@
       }, 350);
     },
 
-    /**
-     * Find the best move for AI (O) using Minimax + Alpha-Beta.
-     * @param {Array} board — current board snapshot
-     * @returns {number} — index of best move (0-8)
-     */
+
     getBestMove(board) {
       let bestScore = -Infinity;
       let bestIndex = -1;
@@ -397,16 +324,7 @@
       return bestIndex;
     },
 
-    /**
-     * Minimax with Alpha-Beta Pruning.
-     *
-     * @param {Array}   board      — current board snapshot
-     * @param {number}  depth      — how many moves deep we are
-     * @param {boolean} isMax      — true = AI's turn (maximising), false = human's turn (minimising)
-     * @param {number}  alpha      — best score AI has secured so far
-     * @param {number}  beta       — best score human has secured so far
-     * @returns {number}           — the heuristic value of this board position
-     */
+
     minimax(board, depth, isMax, alpha, beta) {
       // ── Terminal checks ──
       const winner = this.checkWinner(board);
@@ -427,13 +345,12 @@
             board[i] = null;
 
             alpha = Math.max(alpha, best);
-            if (beta <= alpha) break;   // 🌿 Prune! Human won't allow this path
+            if (beta <= alpha) break;  
           }
         }
         return best;
 
       } else {
-        // ── Human's turn: AI assumes human MINIMISES score ──
         let best = +Infinity;
         for (let i = 0; i < 9; i++) {
           if (!board[i]) {
@@ -442,7 +359,7 @@
             board[i] = null;
 
             beta = Math.min(beta, best);
-            if (beta <= alpha) break;   // 🌿 Prune! AI won't allow this path
+            if (beta <= alpha) break;   
           }
         }
         return best;
@@ -506,9 +423,6 @@
     },
   };
 
-  /* ══════════════════════════════════════════════════════════
-     7. BOOTSTRAP  — start the app
-  ══════════════════════════════════════════════════════════ */
   function bootstrap() {
     EVENTS.init();
     RENDER.playerNames();
@@ -521,6 +435,6 @@
 
   bootstrap();
 
-})(); // ← end IIFE
+})(); 
 
 
